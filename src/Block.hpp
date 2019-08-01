@@ -62,9 +62,9 @@ private:
   string m_hash;
 };
 
-/*=============================================================================
----------------------------- Class Implementation -----------------------------
-==============================================================================*/
+/*
+ * Class Implementation
+ */
 // Constructor
 template <class T>
 Block<T>::Block()
@@ -111,7 +111,7 @@ Block<T>::Block(const Block& block)
 }
 
 // Hash Block data.
-template <class T>
+templat
 string Block<T>::hashBlock()
 {
   SHA256 hash;

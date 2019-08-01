@@ -1,40 +1,43 @@
-/*=============================================================================
---------------------------------- Includes -------------------------------------
-==============================================================================*/
+/*
+ * Includes
+ */
 #include <iostream>
 
-#include "Block.hpp"
-#include "DummyData.hpp"
-/*------------------------------------------------------
---------------------- Namespaces -------------------------
-------------------------------------------------------*/
+#include "SHA256MerkleNode.hpp"
+
 using namespace std;
 
-/*=============================================================================
------------------------------ Main Function -----------------------------------
-==============================================================================*/
-int main(/*int argc, char const *argv[]*/) {
-  //TODO: Abstraer el tipo de dato timestamp y data.
+template<typename NodeType>
+const NodeType *build(NodeType *nodes[], size_t len){
+    if (len == 1) return new NodeType(nodes[0], nullptr);
+    if (len == 2) return new NodeType(nodes[0], nodes[1]);
 
-  cout << "Test up and running." << endl;
+    size_t half = len % 2 == 0 ? len/2 : len/2 + 1;
+    return new NodeType(build(nodes, half), build(nodes + half, len - half));
+}
 
-  // Generating Genesis Block.
-  CDummyData<int> Data1(100);
-  Block<int> EmptyBlock;
+/*
+ * Main
+ */
+int main() {
+    //TODO: Abstraer el tipo de dato timestamp y data.
 
-  Block<int> Genesis (unsigned(0), "10/08/2017", Data1, EmptyBlock );
-  Block<int>* previousBlock(&Genesis);
+    cout << "Test up and running." << endl;
 
-  cout << "Hash o Genesis block is: \n" << Genesis.hashBlock() << endl;
+    // Generating Genesis Block.
+    std::string sl[]{"spring", "winter", "summer", "fall"};
+    SHA256MerkleNode *leaves[4];
 
-  const int numOfBlocks = 10;
+    for (int i = 0; i<4; i++) {
+        leaves[i] = new SHA256MerkleNode(sl[i]);
+    }
 
-  for (int i = 0; i < numOfBlocks; i++) {
-    CDummyData<int> Data(i);
-    Block<int>* block = new Block<int>(unsigned(previousBlock->getIndex()+1), "10/08/2017", Data, *previousBlock);
+    SHA256MerkleNode *a = new SHA256MerkleNode(leaves[0], leaves[1]);
+    SHA256MerkleNode *b = new SHA256MerkleNode(leaves[2], leaves[3]);
+    SHA256MerkleNode root(a, b);
 
-    cout << "Block with index: " << block->getIndex() << " and hash: \n" << block->getHash() << " generated." << endl;
-    previousBlock = block;
-  }
-  return 0;
+
+    cout << "Hash o Genesis block is: \n" << str(root.getHash()) << endl;
+
+    return 0;
 }
